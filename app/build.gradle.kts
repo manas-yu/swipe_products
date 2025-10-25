@@ -84,4 +84,11 @@ dependencies {
 
   // Splash
   implementation("androidx.core:core-splashscreen:1.0.1")
+
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+
+  // OkHttp
+  implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
 }
