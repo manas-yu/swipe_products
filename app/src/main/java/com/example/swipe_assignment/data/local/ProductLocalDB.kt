@@ -11,7 +11,8 @@ import com.example.swipe_assignment.data.local.entity.ProductEntity
 
 @Database(
     entities = [ProductEntity::class, PendingUploadEntity::class, NotificationEntity::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 abstract class ProductLocalDB : RoomDatabase() {
     abstract fun productDao(): ProductDao

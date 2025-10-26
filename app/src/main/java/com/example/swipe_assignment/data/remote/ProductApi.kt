@@ -4,24 +4,32 @@ import com.example.swipe_assignment.data.remote.dto.ProductResponse
 import com.example.swipe_assignment.domain.model.Product
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Call
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
+import retrofit2.http.PartMap
 
 interface ProductApi {
-
     @GET("get")
     suspend fun getProducts(): Response<List<Product>>
 
-    /**
-     * Add or upload a product.
-     *
-     * @param productData Key-value pairs of product fields (name, type, price, tax, etc.)
-     * @param images Optional list of images
-     */
     @Multipart
     @POST("add")
-    suspend fun addOrUploadProduct(
+    suspend fun addProduct(
         @PartMap productData: Map<String, @JvmSuppressWildcards RequestBody>,
-        @Part images: List<MultipartBody.Part> = emptyList()
+        @Part image: MultipartBody.Part? = null
     ): Response<ProductResponse>
+
+    @Multipart
+    @POST("api/public/add")
+    fun uploadProductData(
+        @Part("product_name") productName: RequestBody,
+        @Part("product_type") productType: RequestBody,
+        @Part("price") price: RequestBody,
+        @Part("tax") tax: RequestBody,
+        @Part image: List<MultipartBody.Part>? = emptyList()
+    ): Call<ProductResponse>
 }

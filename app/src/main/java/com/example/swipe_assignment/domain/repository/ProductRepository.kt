@@ -1,4 +1,4 @@
-package com.example.swipe_assignment.data.repository
+package com.example.swipe_assignment.domain.repository
 
 import android.net.Uri
 import com.example.swipe_assignment.data.local.entity.ProductEntity
@@ -15,5 +15,6 @@ interface ProductRepository {
         imageUri: Uri?,
         isForeground: Boolean
     ): ErrorModel<Unit>
+
     fun getUnViewedCount(): Flow<Int>
 }
