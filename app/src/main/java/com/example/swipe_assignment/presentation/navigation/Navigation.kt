@@ -22,9 +22,9 @@ fun Navigation(navController: NavHostController = rememberNavController()) {
             }
         }
         composable(route = Route.NotificationScreen.route) {
-NotificationScreen {
-    navController.popBackStack()
-}
+            NotificationScreen {
+                navController.popBackStack()
+            }
         }
     }
 }

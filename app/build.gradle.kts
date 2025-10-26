@@ -71,6 +71,7 @@ dependencies {
 
   // Hilt
   implementation("com.google.dagger:hilt-android:2.54")
+  implementation("androidx.core:core-splashscreen:1.0.1")
   ksp("com.google.dagger:hilt-compiler:2.54")
 
   // Room — Kotlin 1.9.x compatible line
@@ -94,6 +95,7 @@ dependencies {
   implementation("androidx.datastore:datastore-preferences:1.1.1")
 
   implementation("com.google.accompanist:accompanist-swiperefresh:0.31.4-beta")
+  implementation ("com.google.accompanist:accompanist-systemuicontroller:0.31.4-beta")
 
   // Tooling/tests
   debugImplementation("androidx.compose.ui:ui-tooling")

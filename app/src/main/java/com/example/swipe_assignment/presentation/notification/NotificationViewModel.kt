@@ -22,7 +22,7 @@ class NotificationViewModel @Inject constructor(
 
     init {
         fetchAll()
-        viewModelScope.launch{ repository.markAsViewed() }
+        viewModelScope.launch { repository.markAsViewed() }
     }
 
     fun fetchAll() {
