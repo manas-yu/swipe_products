@@ -10,30 +10,25 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NotificationDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertNotification(notification: NotificationEntity)
+    suspend fun insertProductNotification(product: NotificationEntity)
 
     @Query("SELECT COUNT(*) FROM NotificationEntity WHERE productName = :productName")
-    suspend fun countNotificationsByProductName(productName: String): Int
+    suspend fun getNotificationByProductName(productName: String): Int
 
-    @Query("""
-        UPDATE NotificationEntity 
-        SET status = :status, isViewed = :isViewed 
-        WHERE productName = :productName
-    """)
-    suspend fun updateNotificationStatus(
+    @Query("UPDATE NotificationEntity SET status = :status, isViewed = :isViewed WHERE productName = :productName")
+    suspend fun updateProductStatus(
         status: Progress,
         productName: String,
         isViewed: Boolean = false
     )
 
     @Query("UPDATE NotificationEntity SET isViewed = 1")
-    suspend fun markAllAsViewed()
+    suspend fun updateAllProductsAsViewed()
 
     @Query("SELECT COUNT(*) FROM NotificationEntity WHERE isViewed = 0")
-    fun getUnviewedCount(): Flow<Int>
+    fun getUnViewedCount(): Flow<Int>
 
     @Query("SELECT * FROM NotificationEntity ORDER BY timestamp DESC")
-    fun getAllNotifications(): Flow<List<NotificationEntity>>
+    fun getAllNotification(): Flow<List<NotificationEntity>>
 }
