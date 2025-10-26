@@ -107,7 +107,6 @@ fun NotificationItem(
             )
         }
 
-        // Divider for list separation (optional)
         HorizontalDivider(
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -118,7 +117,6 @@ fun NotificationItem(
     }
 }
 
-/** Compact relative time formatter: "now", "5m", "2h", "Yesterday", "Oct 12" */
 private fun Long.toRelativeTime(now: Long = System.currentTimeMillis()): String {
     val diff = now - this
     if (diff < 0L) return formatDay(this) // future-safe; show date

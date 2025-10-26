@@ -17,8 +17,8 @@ class NotificationViewModel @Inject constructor(
     private val repository: NotificationRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NotificationUiState())
-    val uiState: StateFlow<NotificationUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(NotificationState())
+    val uiState: StateFlow<NotificationState> = _uiState.asStateFlow()
 
     init {
         fetchAll()

@@ -437,12 +437,16 @@ fun ProductBottomSheet(
                                         Text(
                                             text = productType,
                                             style = MaterialTheme.typography.labelMedium,
-                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
                                             modifier = Modifier
                                                 .align(Alignment.End)
-                                                .background(Color(0xFFCE7A00), RoundedCornerShape(topStart = 8.dp))
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                                    shape = RoundedCornerShape(topStart = 8.dp)
+                                                )
                                                 .padding(horizontal = 10.dp, vertical = 6.dp)
                                         )
+
                                     }
                                 }
                             }

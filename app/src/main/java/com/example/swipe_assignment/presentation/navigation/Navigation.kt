@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.swipe_assignment.presentation.notification.NotificationScreen
-import com.example.swipe_assignment.presentation.product.ProductListScreen
+import com.example.swipe_assignment.presentation.product.ProductScreen
 
 @Composable
 fun Navigation(navController: NavHostController = rememberNavController()) {
@@ -17,7 +17,7 @@ fun Navigation(navController: NavHostController = rememberNavController()) {
         startDestination = Route.ProductScreen.route
     ) {
         composable(route = Route.ProductScreen.route) {
-            ProductListScreen {
+            ProductScreen {
                 navController.navigate(Route.NotificationScreen.route)
             }
         }

@@ -63,7 +63,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductListScreen(
+fun ProductScreen(
     viewModel: ProductViewModel = hiltViewModel(),
     onNavigateToNotification: () -> Unit
 ) {
