@@ -22,7 +22,10 @@ android {
   buildTypes {
     release {
       isMinifyEnabled = false
-      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+      proguardFiles(
+        getDefaultProguardFile("proguard-android-optimize.txt"),
+        "proguard-rules.pro"
+      )
     }
   }
 
@@ -34,61 +37,72 @@ android {
 
   buildFeatures { compose = true }
 
-  composeOptions {
-    kotlinCompilerExtensionVersion = "1.5.15"
-  }
+  // Compose compiler 1.5.15 requires Kotlin 1.9.25 (you have that at root)
+  composeOptions { kotlinCompilerExtensionVersion = "1.5.15" }
 
   packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
 }
 
 dependencies {
-  // Core + Compose
-  implementation("androidx.core:core-ktx:1.9.0")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-  implementation("androidx.activity:activity-compose:1.7.0")
-  implementation(platform("androidx.compose:compose-bom:2023.03.00"))
+  // ✅ Real Compose BOM (has pullRefresh in foundation 1.7.x line)
+  implementation(platform("androidx.compose:compose-bom:2024.09.02"))
+
+  // Core Compose
   implementation("androidx.compose.ui:ui")
   implementation("androidx.compose.ui:ui-graphics")
   implementation("androidx.compose.ui:ui-tooling-preview")
+
+  // ✅ Foundation includes androidx.compose.foundation.pullrefresh.*
+  implementation("androidx.compose.foundation:foundation:1.7.3")
+
   implementation("androidx.compose.material3:material3")
-  debugImplementation("androidx.compose.ui:ui-tooling")
-  debugImplementation("androidx.compose.ui:ui-test-manifest")
-  androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+  // Activity / Lifecycle
+  implementation("androidx.activity:activity-compose:1.9.3")
+  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+  implementation("androidx.core:core-ktx:1.13.1")
+
+  // WorkManager
+  implementation("androidx.work:work-runtime-ktx:2.9.1")
 
   // Navigation
-  implementation("androidx.navigation:navigation-compose:2.9.5")
-  implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+  implementation("androidx.navigation:navigation-compose:2.7.7")
+  implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
   // Hilt
   implementation("com.google.dagger:hilt-android:2.54")
   ksp("com.google.dagger:hilt-compiler:2.54")
 
-  // Room
-  implementation("androidx.room:room-runtime:2.8.3")
-  ksp("androidx.room:room-compiler:2.8.3")
-  implementation("androidx.room:room-ktx:2.8.3")
+  // Room — Kotlin 1.9.x compatible line
+  implementation("androidx.room:room-runtime:2.6.1")
+  ksp("androidx.room:room-compiler:2.6.1")
+  implementation("androidx.room:room-ktx:2.6.1")
 
-  // Retrofit
+  // Align SQLite with Room 2.6.1
+  implementation("androidx.sqlite:sqlite:2.3.1")
+  implementation("androidx.sqlite:sqlite-framework:2.3.1")
+
+  // Retrofit / OkHttp
   implementation("com.squareup.retrofit2:retrofit:2.9.0")
   implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+  implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
   // Coil
   implementation("io.coil-kt:coil-compose:2.4.0")
 
   // Datastore
-  implementation("androidx.datastore:datastore-preferences:1.1.7")
+  implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-  // Foundation & Accompanist
-  implementation("androidx.compose.foundation:foundation:1.9.4")
-  implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.4-beta")
+  implementation("com.google.accompanist:accompanist-swiperefresh:0.31.4-beta")
 
-  // Splash
-  implementation("androidx.core:core-splashscreen:1.0.1")
+  // Tooling/tests
+  debugImplementation("androidx.compose.ui:ui-tooling")
+  debugImplementation("androidx.compose.ui:ui-test-manifest")
+  androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+}
 
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-
-  // OkHttp
-  implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
-
+// Optional: keep Room schema JSONs to silence export warning (create app/schemas folder)
+ksp {
+  arg("room.schemaLocation", "$projectDir/schemas")
+  arg("room.generateKotlin", "true")
 }
