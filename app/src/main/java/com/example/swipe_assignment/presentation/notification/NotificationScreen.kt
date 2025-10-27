@@ -102,7 +102,7 @@ fun NotificationScreen(
                 else -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Image(
-                            painter = painterResource(id = R.drawable.no_item),
+                            painter = painterResource(id = R.drawable.ic_no_item),
                             contentDescription = "No data"
                         )
                     }

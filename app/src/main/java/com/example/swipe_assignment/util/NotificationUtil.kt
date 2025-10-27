@@ -23,7 +23,7 @@ class NotificationHelper(private val context: Context) {
 
     fun showUploadProgressNotification(productName: String) {
         val notif = NotificationCompat.Builder(context, CHANNEL_UPLOAD_PROGRESS)
-            .setSmallIcon(R.drawable.upload_progress)
+            .setSmallIcon(R.drawable.ic_upload_progress)
             .setContentTitle("Uploading: $productName")
             .setContentText("In progress…")
             .setOngoing(true)
@@ -39,7 +39,7 @@ class NotificationHelper(private val context: Context) {
 
     fun showUploadSuccessNotification(productName: String) {
         val notif = NotificationCompat.Builder(context, CHANNEL_UPLOAD_RESULT)
-            .setSmallIcon(R.drawable.upload_success)
+            .setSmallIcon(R.drawable.ic_upload_success)
             .setContentTitle("Uploaded")
             .setContentText("$productName uploaded successfully")
             .setAutoCancel(true)
@@ -49,7 +49,7 @@ class NotificationHelper(private val context: Context) {
 
     fun showUploadFailureNotification(productName: String, reason: String?) {
         val notif = NotificationCompat.Builder(context, CHANNEL_UPLOAD_RESULT)
-            .setSmallIcon(R.drawable.upload_failed)
+            .setSmallIcon(R.drawable.ic_upload_fail)
             .setContentTitle("Upload failed")
             .setContentText("$productName: ${reason ?: "Unknown error"}")
             .setAutoCancel(true)

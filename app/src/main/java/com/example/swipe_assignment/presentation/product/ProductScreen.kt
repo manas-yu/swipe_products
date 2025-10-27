@@ -233,7 +233,7 @@ fun ProductScreen(
                 uiState.products.isEmpty() -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Image(
-                            painter = painterResource(R.drawable.no_item),
+                            painter = painterResource(R.drawable.ic_no_item),
                             contentDescription = null,
                             colorFilter = ColorFilter.tint(Color.Gray)
                         )

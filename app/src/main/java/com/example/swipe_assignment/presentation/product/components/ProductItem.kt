@@ -158,7 +158,7 @@ private fun ProductImage(
         },
         error = {
             Image(
-                painter = painterResource(R.drawable.no_image),
+                painter = painterResource(R.drawable.no_image_placeholder),
                 contentDescription = "No image available",
                 modifier = Modifier
                     .fillMaxSize()
@@ -305,7 +305,7 @@ private fun ZoomableImage(
             },
             error = {
                 Image(
-                    painter = painterResource(R.drawable.no_image),
+                    painter = painterResource(R.drawable.no_image_placeholder),
                     contentDescription = "No image available",
                     modifier = Modifier
                         .fillMaxSize()
