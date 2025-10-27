@@ -116,11 +116,12 @@ com.example.swipe_assignment/
 | <img src="sample/img1.jpeg" width="180"/> | <img src="sample/img2.jpeg" width="180"/> | <img src="sample/img3.jpeg" width="180"/> |
 |:------------------------------------------:|:------------------------------------------:|:------------------------------------------:|
 
-| <img src="sample/img4.jpeg" width="180"/> | <img src="sample/img5.jpeg" width="180"/> | <img src="sample/img6.jpeg" width="180"/> |
+| <img src="sample/img4.jpeg" width="180"/> |  <img src="sample/img.png" width="180"/>| <img src="sample/img6.jpeg" width="180"/> |
 |:------------------------------------------:|:------------------------------------------:|:------------------------------------------:|
 
-| <img src="sample/img7.jpeg" width="180"/> | <video src="sample/demo-video.mp4" width="200" controls></video> |  |
+| <img src="sample/img7.jpeg" width="180"/> | <img src="sample/img5.jpeg" width="180"/> |  <video src="https://github.com/user-attachments/assets/947a88a7-91b2-4926-b7ee-163b1d7745bd" width="200" controls></video> |
 |:------------------------------------------:|:------------------------------------------:|:------------------------------------------:|
+
 
 
 
