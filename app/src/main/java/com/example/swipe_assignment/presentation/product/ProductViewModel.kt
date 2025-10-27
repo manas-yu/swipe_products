@@ -96,7 +96,6 @@ class ProductViewModel @Inject constructor(
         imageUri: Uri?
     ) {
         viewModelScope.launch {
-            //     _uiState.update { it.copy(isLoading = true, error = null) } // Show loading
             try {
                 val result = repository.addProduct(
                     productName = productName,

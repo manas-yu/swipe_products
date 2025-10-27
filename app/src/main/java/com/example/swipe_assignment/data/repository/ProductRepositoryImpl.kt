@@ -163,6 +163,7 @@ class ProductRepositoryImpl @Inject constructor(
         tax: Double,
         imageUri: Uri?
     ) {
+        Log.d("save pending upload",productName)
         val imagePath = imageUri?.let { persistImage(it) }
         pendingUploadDao.insert(
             PendingUploadEntity(
@@ -181,8 +182,7 @@ class ProductRepositoryImpl @Inject constructor(
             )
         )
         notificationHelper.showUploadProgressNotification(
-            productName,
-            "Waiting for the internet connection"
+            productName
         )
         ProductUploadWorker.schedule(context)
     }

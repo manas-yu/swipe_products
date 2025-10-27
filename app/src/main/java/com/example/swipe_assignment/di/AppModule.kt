@@ -27,7 +27,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    // --- Networking ---
     @Provides
     @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor =
@@ -57,7 +56,6 @@ object AppModule {
     fun provideProductApi(retrofit: Retrofit): ProductApi =
         retrofit.create(ProductApi::class.java)
 
-    // --- Room database + DAOs ---
     @Provides
     @Singleton
     fun provideDatabase(app: Application): ProductLocalDB =
@@ -77,7 +75,6 @@ object AppModule {
     @Singleton
     fun providePendingUploadDao(db: ProductLocalDB): PendingUploadDao = db.pendingUploadDao()
 
-    // --- Utilities used in repositories/workers ---
     @Provides
     @Singleton
     fun provideUploadNotifier(@ApplicationContext context: Context): NotificationHelper =

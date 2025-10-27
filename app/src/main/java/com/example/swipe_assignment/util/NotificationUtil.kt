@@ -1,76 +1,96 @@
 package com.example.swipe_assignment.util
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.example.swipe_assignment.R
 
 class NotificationHelper(private val context: Context) {
-    private val notificationManager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    init {
-        createNotificationChannel()
+    companion object {
+        const val CHANNEL_UPLOAD_PROGRESS = "upload_progress"
+        const val CHANNEL_UPLOAD_RESULT = "upload_result"
+
+        private const val ID_PROGRESS = 1001
+        private const val ID_RESULT = 1002
     }
 
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Product Upload Notifications",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "Notifications for product upload status"
-            }
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
+    // ---- Public API ---------------------------------------------------------
 
-    fun showUploadProgressNotification(productName: String, message: String? = null) {
-        val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
+    fun showUploadProgressNotification(productName: String) {
+        val notif = NotificationCompat.Builder(context, CHANNEL_UPLOAD_PROGRESS)
             .setSmallIcon(R.drawable.upload_progress)
-            .setContentTitle("Uploading $productName")
-            .setContentText(message ?: "Upload in progress...")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentTitle("Uploading: $productName")
+            .setContentText("In progress…")
             .setOngoing(true)
-            .setProgress(0, 0, true) // indeterminate progress
-
-        notificationManager.notify(PROGRESS_NOTIFICATION_ID, notificationBuilder.build())
+            .setOnlyAlertOnce(true)
+            .setProgress(0, 0, true)
+            .build()
+        safeNotify(ID_PROGRESS, notif)
     }
 
     fun hideProgressNotification() {
-        notificationManager.cancel(PROGRESS_NOTIFICATION_ID)
+        safeCancel(ID_PROGRESS)
     }
-
 
     fun showUploadSuccessNotification(productName: String) {
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notif = NotificationCompat.Builder(context, CHANNEL_UPLOAD_RESULT)
             .setSmallIcon(R.drawable.upload_success)
-            .setContentTitle("Product Upload Success")
-            .setContentText("$productName has been uploaded successfully")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentTitle("Uploaded")
+            .setContentText("$productName uploaded successfully")
             .setAutoCancel(true)
             .build()
-
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        safeNotify(ID_RESULT, notif)
     }
 
-    fun showUploadFailureNotification(productName: String, error: String) {
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+    fun showUploadFailureNotification(productName: String, reason: String?) {
+        val notif = NotificationCompat.Builder(context, CHANNEL_UPLOAD_RESULT)
             .setSmallIcon(R.drawable.upload_failed)
-            .setContentTitle("Product Upload Failed")
-            .setContentText("Failed to upload $productName: $error")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentTitle("Upload failed")
+            .setContentText("$productName: ${reason ?: "Unknown error"}")
             .setAutoCancel(true)
             .build()
-
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        safeNotify(ID_RESULT, notif)
     }
 
-    companion object {
-        private const val CHANNEL_ID = "product_upload_channel"
-        private const val PROGRESS_NOTIFICATION_ID = 1001
+    // ---- Safety wrappers ----------------------------------------------------
+
+    private fun safeNotify(id: Int, notification: android.app.Notification) {
+        if (!canPostNotifications()) return
+        try {
+            NotificationManagerCompat.from(context).notify(id, notification)
+        } catch (se: SecurityException) {
+            // Permission revoked at runtime or OEM quirk; ignore gracefully
+            android.util.Log.w("NotificationHelper", "notify() blocked by SecurityException", se)
+        }
+    }
+
+    private fun safeCancel(id: Int) {
+        // cancel doesn't require permission, but wrap for parity
+        try {
+            NotificationManagerCompat.from(context).cancel(id)
+        } catch (se: SecurityException) {
+            android.util.Log.w("NotificationHelper", "cancel() blocked by SecurityException", se)
+        }
+    }
+
+    // ---- Permission / settings checks --------------------------------------
+
+    private fun canPostNotifications(): Boolean {
+        // 1) Are app notifications enabled in system settings?
+        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false
+
+        // 2) On Android 13+ we also need POST_NOTIFICATIONS runtime permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val granted = ContextCompat.checkSelfPermission(
+                context, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!granted) return false
+        }
+        return true
     }
 }
