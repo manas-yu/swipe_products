@@ -2,7 +2,6 @@ package com.example.swipe_assignment.data.repository
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.example.swipe_assignment.data.local.dao.NotificationDao
 import com.example.swipe_assignment.data.local.dao.PendingUploadDao
 import com.example.swipe_assignment.data.local.dao.ProductDao
@@ -62,7 +61,7 @@ class ProductRepositoryImpl @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            Log.e("REPOSITORY", "refreshProducts error: ${e.message}")
+            return
         }
     }
 
@@ -137,7 +136,6 @@ class ProductRepositoryImpl @Inject constructor(
     }
 
     private fun createImagePart(uri: Uri): MultipartBody.Part? {
-        Log.d("REPOSITORY", "createImagePart")
         try {
             val contentResolver = context.contentResolver
             val inputStream = contentResolver.openInputStream(uri) ?: return null
@@ -148,10 +146,8 @@ class ProductRepositoryImpl @Inject constructor(
             }
 
             val requestFile = tempFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
-            Log.d("REPOSITORY", "returning createImagePart")
             return MultipartBody.Part.createFormData("files[]", tempFile.name, requestFile)
         } catch (e: Exception) {
-            Log.d("REPOSITORY", "createImagePart error: ${e.message}")
             return null
         }
     }
@@ -163,7 +159,6 @@ class ProductRepositoryImpl @Inject constructor(
         tax: Double,
         imageUri: Uri?
     ) {
-        Log.d("save pending upload",productName)
         val imagePath = imageUri?.let { persistImage(it) }
         pendingUploadDao.insert(
             PendingUploadEntity(
@@ -197,7 +192,6 @@ class ProductRepositoryImpl @Inject constructor(
             inputStream?.close()
             file.absolutePath
         } catch (e: Exception) {
-            Log.e("REPOSITORY", "Error persisting image: ${e.message}")
             null
         }
     }
@@ -208,7 +202,6 @@ class ProductRepositoryImpl @Inject constructor(
             val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
             MultipartBody.Part.createFormData("files[]", file.name, requestFile)
         } catch (e: Exception) {
-            Log.e("REPOSITORY", "createImagePart error: ${e.message}")
             null
         }
     }

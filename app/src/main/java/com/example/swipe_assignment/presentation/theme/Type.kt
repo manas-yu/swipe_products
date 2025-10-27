@@ -1,4 +1,4 @@
-package com.example.swipe_assignment.ui.theme
+package com.example.swipe_assignment.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,4 +1,4 @@
-package com.example.swipe_assignment.ui.theme
+package com.example.swipe_assignment.presentation.theme
 
 import android.app.Activity
 import android.os.Build

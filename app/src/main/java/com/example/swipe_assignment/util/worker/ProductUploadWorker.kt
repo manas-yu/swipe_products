@@ -4,7 +4,13 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.hilt.work.HiltWorker
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import com.example.swipe_assignment.data.local.dao.PendingUploadDao
 import com.example.swipe_assignment.domain.model.ErrorModel
 import com.example.swipe_assignment.domain.repository.ProductRepository
@@ -34,8 +40,8 @@ class ProductUploadWorker @AssistedInject constructor(
                 isForeground = false
             )) {
                 is ErrorModel.Success -> pendingUploadDao.delete(p)
-                is ErrorModel.Error   -> Log.e("WORKER", "Upload failed for ${p.productName}")
-                else                  -> Log.d("WORKER", "Unexpected state for ${p.productName}")
+                is ErrorModel.Error -> Log.e("WORKER", "Upload failed for ${p.productName}")
+                else -> Log.d("WORKER", "Unexpected state for ${p.productName}")
             }
         }
         Result.success()

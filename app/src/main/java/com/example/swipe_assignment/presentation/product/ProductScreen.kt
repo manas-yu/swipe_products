@@ -1,7 +1,6 @@
 package com.example.swipe_assignment.presentation.product
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -45,18 +43,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.swipe_assignment.R
-import com.example.swipe_assignment.presentation.product.components.ProductBottomSheet
 import com.example.swipe_assignment.presentation.product.components.ProductItem
+import com.example.swipe_assignment.presentation.product.components.bottomsheet.ProductBottomSheet
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.delay
@@ -116,14 +113,7 @@ fun ProductScreen(
             if (!isSearchBarVisible) {
                 TopAppBar(
                     title = {
-                        Image(
-                            painter = painterResource(id = if (isSystemInDarkTheme()) R.drawable.logo_night else R.drawable.logo),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(84.dp)
-                                .scale(1.0f)
-                                .padding(start = 12.dp, top = 12.dp, bottom = 12.dp)
-                        )
+                        Text("Products")
                     },
                     actions = {
                         IconButton(onClick = { isSearchBarVisible = true }) {

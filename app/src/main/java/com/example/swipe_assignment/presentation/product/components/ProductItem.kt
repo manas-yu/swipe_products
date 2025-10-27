@@ -9,41 +9,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -121,12 +95,7 @@ fun ProductItem(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         AssistChip(
                             onClick = {},
-                            label = {
-                                Text(
-                                    rupee.format(product.price),
-                                    style = MaterialTheme.typography.labelLarge
-                                )
-                            },
+                            label = { Text(rupee.format(product.price)) },
                             shape = RoundedCornerShape(10.dp),
                             border = AssistChipDefaults.assistChipBorder(enabled = false),
                             colors = AssistChipDefaults.assistChipColors(
@@ -205,8 +174,8 @@ private fun ProductImage(
 private fun TypeBadge(
     text: String,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.secondaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
 ) {
     Surface(
         modifier = modifier,
@@ -225,25 +194,30 @@ private fun TypeBadge(
     }
 }
 
-
 @Composable
 private fun ImagePreviewDialog(
     imageUrl: String,
     onDismiss: () -> Unit
 ) {
+    val isDark = isSystemInDarkTheme()
+    val bgColor = if (isDark) Color.Black.copy(alpha = 0.96f) else Color.White
+    val iconBg = if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.08f)
+    val iconTint = if (isDark) Color.White else Color.Black
+
     Dialog(onDismissRequest = onDismiss) {
         Box(
             Modifier
                 .fillMaxWidth()
                 .heightIn(min = 360.dp)
-                .background(Color.Black.copy(alpha = 0.96f), RoundedCornerShape(16.dp))
+                .background(bgColor, RoundedCornerShape(16.dp))
                 .padding(10.dp)
                 .semantics { contentDescription = "Zoomable image dialog" }
         ) {
             ZoomableImage(
                 imageUrl = imageUrl,
                 modifier = Modifier.fillMaxWidth(),
-                enableRotation = false
+                enableRotation = false,
+                lightMode = !isDark
             )
 
             IconButton(
@@ -252,12 +226,12 @@ private fun ImagePreviewDialog(
                     .align(Alignment.TopEnd)
                     .padding(2.dp)
                     .size(36.dp)
-                    .background(Color.White.copy(alpha = 0.12f), CircleShape)
+                    .background(iconBg, CircleShape)
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Close",
-                    tint = Color.White
+                    tint = iconTint
                 )
             }
         }
@@ -270,7 +244,8 @@ private fun ZoomableImage(
     modifier: Modifier = Modifier,
     minScale: Float = 1f,
     maxScale: Float = 4f,
-    enableRotation: Boolean = false
+    enableRotation: Boolean = false,
+    lightMode: Boolean = false
 ) {
     val ctx = LocalContext.current
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
@@ -278,34 +253,26 @@ private fun ZoomableImage(
     val scale = remember { Animatable(1f) }
     val offset = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
     var rotation by remember { mutableFloatStateOf(0f) }
-
     val scope = rememberCoroutineScope()
 
     val transformState = rememberTransformableState { zoomChange, panChange, rotationChange ->
         val newScale = (scale.value * zoomChange).coerceIn(minScale, maxScale)
-
         scope.launch {
             scale.snapTo(newScale)
             val clamped = clampOffset(offset.value + panChange, newScale, containerSize)
             offset.snapTo(clamped)
         }
-
-        if (enableRotation) {
-            rotation += rotationChange
-        }
+        if (enableRotation) rotation += rotationChange
     }
 
     val onDoubleTap: () -> Unit = {
         scope.launch {
-            if (scale.value < 1.5f) {
-                scale.animateTo(2f, tween(220))
-            } else {
+            if (scale.value < 1.5f) scale.animateTo(2f, tween(220))
+            else {
                 scale.animateTo(1f, tween(200))
                 offset.animateTo(Offset.Zero, tween(200))
                 rotation = 0f
             }
-            val clamped = clampOffset(offset.value, scale.value, containerSize)
-            if (clamped != offset.value) offset.animateTo(clamped, tween(160))
         }
     }
 
@@ -314,12 +281,9 @@ private fun ZoomableImage(
             .onSizeChanged { containerSize = it }
             .aspectRatio(1f)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.Black)
-            .pointerInput(Unit) {
-                detectTapGestures(onDoubleTap = { onDoubleTap() })
-            }
+            .background(if (lightMode) Color.White else Color.Black)
+            .pointerInput(Unit) { detectTapGestures(onDoubleTap = { onDoubleTap() }) }
             .graphicsLayer {
-                // Apply current transform
                 scaleX = scale.value
                 scaleY = scale.value
                 rotationZ = if (enableRotation) rotation else 0f
@@ -336,7 +300,7 @@ private fun ZoomableImage(
             contentScale = ContentScale.Fit,
             loading = {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(strokeWidth = 2.dp, color = Color.White)
+                    CircularProgressIndicator(strokeWidth = 2.dp, color = if (lightMode) Color.Black else Color.White)
                 }
             },
             error = {
@@ -359,7 +323,10 @@ private fun ZoomableImage(
         if (hintAlpha > 0f) {
             Text(
                 "Double-tap to zoom",
-                color = Color.White.copy(alpha = 0.6f * hintAlpha),
+                color = if (lightMode)
+                    Color.Black.copy(alpha = 0.6f * hintAlpha)
+                else
+                    Color.White.copy(alpha = 0.6f * hintAlpha),
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -372,19 +339,15 @@ private fun ZoomableImage(
         val clamped = clampOffset(offset.value, scale.value, containerSize)
         if (clamped != offset.value) offset.snapTo(clamped)
     }
-
 }
 
 private fun clampOffset(current: Offset, scale: Float, container: IntSize): Offset {
     if (container.width == 0 || container.height == 0) return Offset.Zero
     val w = container.width.toFloat()
     val h = container.height.toFloat()
-
     if (scale <= 1f) return Offset.Zero
-
     val maxX = (w * (scale - 1f)) / 2f
     val maxY = (h * (scale - 1f)) / 2f
-
     val clampedX = current.x.coerceIn(-maxX, maxX)
     val clampedY = current.y.coerceIn(-maxY, maxY)
     return Offset(clampedX, clampedY)
