@@ -43,7 +43,6 @@ This project was built with a focus on **clean architecture**, **modularization*
   - Product type selection (dropdown).  
   - Non-empty product name.  
   - Decimal validation for price and tax.  
-- Supports **optional image upload** (JPEG/PNG, 1:1 ratio).  
 - Displays **upload progress indicators** and **Snackbar** or **Dialog** feedback on success/failure.  
 - Integrates with **Notification Manager** for background status updates.
 
@@ -121,6 +120,7 @@ com.example.swipe_assignment/
 
 | <img src="sample/img7.jpeg" width="180"/> | <img src="sample/img5.jpeg" width="180"/> |  <video src="https://github.com/user-attachments/assets/947a88a7-91b2-4926-b7ee-163b1d7745bd" width="200" controls></video> |
 |:------------------------------------------:|:------------------------------------------:|:------------------------------------------:|
+
 
 
 
