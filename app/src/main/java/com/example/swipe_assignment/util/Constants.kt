@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 object Constants {
     const val BASE_URL = "https://app.getswipe.in/api/public/"
     const val PENDING_UPLOADS_TABLE = "pending_uploads"
-    const val PRODUCTS_TABLE = "products_table"
+    const val PRODUCTS_TABLE = "products"
 }
 
 enum class Progress(val color: Color) {
