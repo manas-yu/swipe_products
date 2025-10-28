@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NotificationDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertProductNotification(product: NotificationEntity)
 
     @Query("SELECT COUNT(*) FROM NotificationEntity WHERE productName = :productName")
