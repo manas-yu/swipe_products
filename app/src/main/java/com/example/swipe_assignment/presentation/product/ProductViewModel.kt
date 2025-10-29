@@ -140,6 +140,6 @@ class ProductViewModel @Inject constructor(
     }
 
     fun clearError() {
-        _uiState.value.error = null
+        _uiState.update { it.copy(error = null) }
     }
 }

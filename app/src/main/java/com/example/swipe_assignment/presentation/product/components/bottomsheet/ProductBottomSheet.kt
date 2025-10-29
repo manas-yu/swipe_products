@@ -1,6 +1,11 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.swipe_assignment.presentation.product.components.bottomsheet
 
+import android.app.Activity
+import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -47,10 +52,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.swipe_assignment.presentation.product.ProductViewModel
+import com.yalantis.ucrop.UCrop
+import java.io.File
 
 private enum class ProductStep { Details, Pricing, Image, Review }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductBottomSheet(
     viewModel: ProductViewModel,
@@ -76,14 +82,54 @@ fun ProductBottomSheet(
     val progressTarget = (step.toFloat() / (totalSteps - 1).coerceAtLeast(1))
     val progress by animateFloatAsState(progressTarget, label = "progress")
 
-    val imagePicker =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            imageUri = uri
-        }
-    LocalContext.current
+    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(productName, productType, price, tax) { error = null }
+
+    val cropLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            UCrop.getOutput(result.data!!)?.let { output ->
+                imageUri = output
+            }
+        } else if (result.resultCode == UCrop.RESULT_ERROR) {
+            val cropError = UCrop.getError(result.data!!)
+            cropError?.let {
+                Toast.makeText(
+                    context,
+                    "Image cropping failed: ${it.localizedMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    fun launchCrop(ctx: Context, source: Uri) {
+        val dest = Uri.fromFile(File(ctx.cacheDir, "crop_${System.currentTimeMillis()}.jpg"))
+
+        val options = UCrop.Options().apply {
+            setCompressionFormat(android.graphics.Bitmap.CompressFormat.JPEG)
+            setCompressionQuality(90)
+            setFreeStyleCropEnabled(true)
+            setShowCropGrid(true)
+            setHideBottomControls(false)
+        }
+
+        val intent = UCrop.of(source, dest)
+            .withAspectRatio(1f, 1f)
+            .withMaxResultSize(1600, 1600)
+            .withOptions(options)
+            .getIntent(ctx)
+
+        cropLauncher.launch(intent)
+    }
+
+    val imagePicker =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) launchCrop(context, uri)
+        }
 
     fun validateAndNext() {
         when (ProductStep.entries[step]) {
@@ -120,24 +166,16 @@ fun ProductBottomSheet(
                 val p = price.toDoubleOrNull()
                 val t = tax.toDoubleOrNull()
                 if (p == null || t == null) {
-                    error = "Invalid number format"
-                    return
+                    error = "Invalid number format"; return
                 }
                 isUploading = true
-                try {
-                    viewModel.addProduct(
-                        productName.trim(),
-                        productType.trim(),
-                        p,
-                        t,
-                        imageUri
-                    )
-                    onDismiss()
-                } catch (_: Exception) {
-                    onDismiss()
-                } finally {
-                    isUploading = false
-                }
+                viewModel.addProduct(
+                    productName = productName.trim(),
+                    productType = productType.trim(),
+                    price = p, tax = t, imageUri = imageUri
+                )
+                isUploading = false
+                onDismiss()
             }
         }
     }
@@ -158,15 +196,14 @@ fun ProductBottomSheet(
                 .padding(horizontal = 20.dp)
         ) {
             StepHeader(step, totalSteps, progress)
-
             Spacer(Modifier.height(12.dp))
 
             AnimatedContent(
                 targetState = currentStep,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
                 label = "stepTransition"
-            ) { current ->
-                when (current) {
+            ) { cur ->
+                when (cur) {
                     ProductStep.Details -> DetailsStep(
                         productName,
                         { productName = it },
@@ -175,8 +212,7 @@ fun ProductBottomSheet(
                         isTypeExpanded,
                         { isTypeExpanded = it },
                         uniqueProductTypes,
-                        { validateAndNext() }
-                    )
+                        { validateAndNext() })
 
                     ProductStep.Pricing -> PricingStep(
                         price,
@@ -186,11 +222,15 @@ fun ProductBottomSheet(
                         { validateAndNext() })
 
                     ProductStep.Image -> ImageStep(
-                        imageUri,
-                        { imagePicker.launch("image/*") },
-                        { imageUri = null })
+                        imageUri = imageUri,
+                        onPick = { imagePicker.launch("image/*") },
+                        onRemove = { imageUri = null },
+                        onCrop = { imageUri?.let { launchCrop(context, it) } }
+                    )
 
-                    ProductStep.Review -> ReviewStep(productName, productType, price, tax, imageUri)
+                    ProductStep.Review -> ReviewStep(
+                        productName, productType, price, tax, imageUri
+                    )
                 }
             }
 
@@ -248,6 +288,3 @@ fun ProductBottomSheet(
         }
     }
 }
-
-
-

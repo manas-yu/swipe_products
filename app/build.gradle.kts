@@ -104,6 +104,11 @@ dependencies {
   androidTestImplementation("androidx.compose.ui:ui-test-junit4")
   androidTestImplementation("androidx.test.ext:junit:1.2.1")
   androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+
+  // Image Cropper
+  implementation("com.github.yalantis:ucrop:2.2.11")
+  implementation("androidx.appcompat:appcompat:1.7.0")
+  implementation("androidx.transition:transition:1.5.1")
 }
 
 kapt {

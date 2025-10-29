@@ -35,7 +35,12 @@ import coil.request.ImageRequest
 import com.example.swipe_assignment.R
 
 @Composable
-fun ImageStep(imageUri: Uri?, onPick: () -> Unit, onRemove: () -> Unit) {
+fun ImageStep(
+    imageUri: Uri?,
+    onPick: () -> Unit,
+    onRemove: () -> Unit,
+    onCrop: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Card(
             modifier = Modifier
@@ -80,11 +85,24 @@ fun ImageStep(imageUri: Uri?, onPick: () -> Unit, onRemove: () -> Unit) {
                             .size(32.dp)
                             .align(Alignment.TopEnd)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
                             .clickable { onRemove() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = null)
+                        Icon(Icons.Default.Close, contentDescription = "Remove")
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .align(Alignment.TopStart)
+                            .clip(RoundedCornerShape(100))
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.85f))
+                            .clickable { onCrop() }
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Crop", color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
