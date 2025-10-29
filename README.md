@@ -1,5 +1,5 @@
 # Swipe Products – Android Assignment
-**Download APK**: [[Link](https://drive.google.com/file/d/1qWpF8951IPadfcjxkybXwqiQWaiLwoxx/view?usp=sharing)]
+**Download APK**: [[Link](https://drive.google.com/file/d/19WnSqPamgptstIN_eWiQTo_kx78CNaMC/view?usp=sharing)]
 
 This repository contains the implementation of the **Swipe Products App**, developed as part of the Swipe Android Assignment.  
 The project demonstrates modern Android development practices using **Jetpack Compose**, **MVVM architecture**, **Retrofit**, **Room**, **WorkManager**, and **Dagger Hilt** for dependency injection.
@@ -46,6 +46,7 @@ This project was built with a focus on **clean architecture**, **modularization*
   - Decimal validation for price and tax.  
 - Displays **upload progress indicators** and **Snackbar** or **Dialog** feedback on success/failure.  
 - Integrates with **Notification Manager** for background status updates.
+- Supports image cropping (1:1 aspect ratio) using the uCrop library, allowing users to select and adjust square images before uploading
 
 ### 3. Offline Mode and Sync
 - Products added offline are stored locally in **Room Database**.  
@@ -121,6 +122,7 @@ com.example.swipe_assignment/
 
 | <img src="sample/img7.jpeg" width="180"/> | <img src="sample/img5.jpeg" width="180"/> |  <video src="https://github.com/user-attachments/assets/947a88a7-91b2-4926-b7ee-163b1d7745bd" width="200" controls></video> |
 |:------------------------------------------:|:------------------------------------------:|:------------------------------------------:|
+
 
 
 
