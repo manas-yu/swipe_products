@@ -141,21 +141,33 @@ private fun ProductImage(
     imageUrlOrEmpty: String,
     modifier: Modifier = Modifier
 ) {
-    val hasUrl = imageUrlOrEmpty.isNotBlank()
     val ctx = LocalContext.current
 
+    val normalized = remember(imageUrlOrEmpty) {
+        when {
+            imageUrlOrEmpty.isBlank() -> null
+            imageUrlOrEmpty.startsWith("/") -> "file://$imageUrlOrEmpty"
+            else -> imageUrlOrEmpty
+        }
+    }
+
     SubcomposeAsyncImage(
-        model = if (hasUrl) {
-            ImageRequest.Builder(ctx).data(imageUrlOrEmpty).crossfade(true).build()
-        } else null,
+        model = ImageRequest.Builder(ctx)
+            .data(normalized)
+            .crossfade(true)
+            .fallback(R.drawable.no_image_placeholder)
+            .error(R.drawable.no_image_placeholder)
+            .build(),
         contentDescription = "Product image",
         modifier = modifier.fillMaxWidth(),
-        contentScale = if (hasUrl) ContentScale.Crop else ContentScale.Inside,
+        contentScale = if (normalized != null) ContentScale.Crop else ContentScale.Inside,
         loading = {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(strokeWidth = 2.dp)
             }
         },
+
+        success = { SubcomposeAsyncImageContent() },
         error = {
             Image(
                 painter = painterResource(R.drawable.no_image_placeholder),
@@ -165,8 +177,7 @@ private fun ProductImage(
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentScale = ContentScale.Inside
             )
-        },
-        success = { SubcomposeAsyncImageContent() }
+        }
     )
 }
 
@@ -294,15 +305,33 @@ private fun ZoomableImage(
             .transformable(transformState)
     ) {
         SubcomposeAsyncImage(
-            model = ImageRequest.Builder(ctx).data(imageUrl).crossfade(true).build(),
+            model = ImageRequest.Builder(ctx)
+                .data(imageUrl)
+                .crossfade(true)
+                .allowHardware(false)
+                .placeholder(R.drawable.no_image_placeholder)
+                .error(R.drawable.no_image_placeholder)
+                .build(),
             contentDescription = "Zoomable image",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit,
             loading = {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(strokeWidth = 2.dp, color = if (lightMode) Color.Black else Color.White)
+
+                Box(Modifier.fillMaxSize()) {
+                    Image(
+                        painter = painterResource(R.drawable.no_image_placeholder),
+                        contentDescription = null,
+                        modifier = Modifier.matchParentSize(),
+                        contentScale = ContentScale.Fit
+                    )
+                    CircularProgressIndicator(
+                        strokeWidth = 2.dp,
+                        color = if (lightMode) Color.Black else Color.White,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
             },
+            success = { SubcomposeAsyncImageContent() },
             error = {
                 Image(
                     painter = painterResource(R.drawable.no_image_placeholder),
@@ -312,8 +341,7 @@ private fun ZoomableImage(
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentScale = ContentScale.Inside
                 )
-            },
-            success = { SubcomposeAsyncImageContent() }
+            }
         )
 
         val hintAlpha by animateFloatAsState(

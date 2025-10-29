@@ -52,16 +52,27 @@ class ProductRepositoryImpl @Inject constructor(
     }
 
     private suspend fun refreshProducts() {
-        try {
-            val response = api.getProducts()
-            if (response.isSuccessful) {
-                productDao.deleteAllProducts()
-                response.body()?.forEach { product ->
+        val response = api.getProducts()
+        if (response.isSuccessful) {
+            response.body().orEmpty().forEach { product ->
+                val exists = productDao.countByKey(
+                    name = product.name,
+                    type = product.type,
+                    price = product.price,
+                    tax = product.tax
+                ) > 0
+                if (!exists) {
                     productDao.insertProduct(product.toEntity())
+                } else {
+                    productDao.updateImageByKey(
+                        name = product.name,
+                        type = product.type,
+                        price = product.price,
+                        tax = product.tax,
+                        serverImage = product.image
+                    )
                 }
             }
-        } catch (e: Exception) {
-            return
         }
     }
 
@@ -114,6 +125,14 @@ class ProductRepositoryImpl @Inject constructor(
                 )
                 notificationHelper.hideProgressNotification()
                 notificationHelper.showUploadSuccessNotification(productName)
+                val serverImage = response.body()?.details?.image
+                productDao.updateImageByKey(
+                    name = productName,
+                    type = productType,
+                    price = price,
+                    tax = tax,
+                    serverImage = serverImage
+                )
                 ErrorModel.Success(Unit)
             } else {
                 notificationHelper.hideProgressNotification()
@@ -160,6 +179,16 @@ class ProductRepositoryImpl @Inject constructor(
         imageUri: Uri?
     ) {
         val imagePath = imageUri?.let { persistImage(it) }
+        productDao.insertProduct(
+            ProductEntity(
+                image = imagePath?.let { "file://$it" },
+                price = price,
+                productName = productName,
+                productType = productType,
+                tax = tax
+            )
+        )
+
         pendingUploadDao.insert(
             PendingUploadEntity(
                 productName = productName,

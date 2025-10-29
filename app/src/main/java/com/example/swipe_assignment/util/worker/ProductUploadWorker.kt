@@ -39,7 +39,9 @@ class ProductUploadWorker @AssistedInject constructor(
                 imageUri = p.imageUri?.let(Uri::parse),
                 isForeground = false
             )) {
-                is ErrorModel.Success -> pendingUploadDao.delete(p)
+                is ErrorModel.Success -> {
+                    pendingUploadDao.delete(p)
+                }
                 is ErrorModel.Error -> Log.e("WORKER", "Upload failed for ${p.productName}")
                 else -> Log.d("WORKER", "Unexpected state for ${p.productName}")
             }
